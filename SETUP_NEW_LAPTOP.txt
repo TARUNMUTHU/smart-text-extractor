@@ -1,0 +1,280 @@
+========================================
+INSTALLATION GUIDE FOR NEW LAPTOP/PC
+========================================
+
+SMART HANDWRITTEN TEXT EXTRACTOR v2.1
+AI-Powered OCR with Answer Evaluation
+
+========================================
+PREREQUISITES
+========================================
+
+1. Python 3.8 to 3.13 (NOT 3.14 - too new!)
+   Download Python 3.13: https://www.python.org/downloads/
+   
+   ⚠️ IMPORTANT: Python 3.14 is NOT supported yet!
+   ⚠️ Use Python 3.13 or 3.12 for best compatibility
+   
+   During installation, check:
+   ✓ "Add Python to PATH"
+   ✓ "Install pip"
+
+2. Internet connection (for downloading packages)
+
+========================================
+INSTALLATION STEPS (Windows)
+========================================
+
+METHOD 1: AUTOMATIC SETUP (Recommended)
+----------------------------------------
+
+1. Copy the entire project folder to your new laptop
+
+2. Open Command Prompt (cmd) in the project folder
+   - Right-click on folder → "Open in Terminal"
+   - Or: Win+R → type "cmd" → navigate to folder
+
+3. Run the setup script:
+   setup.bat
+
+4. Wait for installation (5-10 minutes)
+   - It will download ~550MB of packages
+   - Creates virtual environment
+   - Installs all dependencies
+
+5. When prompted:
+   - Install Google Vision? → Type 'n' (unless you need it)
+   - Install Gemini AI? → Type 'y' (for answer evaluation)
+
+6. Done! ✓
+
+
+METHOD 2: MANUAL SETUP
+----------------------------------------
+
+1. Open Command Prompt in project folder
+
+2. Create virtual environment:
+   python -m venv venv
+
+3. Activate virtual environment:
+   venv\Scripts\activate
+
+4. Upgrade pip:
+   python -m pip install --upgrade pip
+
+5. Install all requirements:
+   pip install -r requirements.txt
+
+6. Download TextBlob data:
+   python -m textblob.download_corpora
+
+7. Install Gemini for AI evaluation:
+   pip install google-generativeai
+
+8. Done! ✓
+
+
+========================================
+SETUP API KEY (For AI Evaluation)
+========================================
+
+1. Get FREE API key:
+   Visit: https://aistudio.google.com/app/apikey
+   - Sign in with Google account
+   - Click "Create API Key"
+   - Copy your key
+
+2. Set the API key:
+   
+   OPTION A - Temporary (for current session):
+   set GEMINI_API_KEY=your_api_key_here
+   
+   OPTION B - Permanent (recommended):
+   - Press Win+X → System
+   - Advanced system settings
+   - Environment Variables
+   - New User Variable:
+     Name: GEMINI_API_KEY
+     Value: your_api_key_here
+   - Click OK
+   - Restart Command Prompt
+
+
+========================================
+RUNNING THE APPLICATION
+========================================
+
+METHOD 1: With AI Evaluation (Recommended)
+-------------------------------------------
+run_with_ai.bat
+
+Then open: http://localhost:8000
+
+
+METHOD 2: Basic (Without AI)
+-------------------------------------------
+run.bat
+
+Then open: http://localhost:8000
+
+
+METHOD 3: Manual
+-------------------------------------------
+venv\Scripts\activate
+python app.py
+
+Then open: http://localhost:8000
+
+
+========================================
+VERIFICATION
+========================================
+
+After installation, verify everything works:
+
+1. Run: python --version
+   Should show: Python 3.8 or higher
+
+2. Run: pip list
+   Should show installed packages
+
+3. Start app: run_with_ai.bat
+   Should show: Server running at http://0.0.0.0:8000
+
+4. Open browser: http://localhost:8000
+   Should see the web interface
+
+
+========================================
+TROUBLESHOOTING
+========================================
+
+PROBLEM: "Python is not recognized"
+SOLUTION: 
+- Reinstall Python with "Add to PATH" checked
+- Or add Python to PATH manually
+
+PROBLEM: "pip is not recognized"  
+SOLUTION:
+python -m pip install --upgrade pip
+
+PROBLEM: "Module not found"
+SOLUTION:
+venv\Scripts\activate
+pip install -r requirements.txt
+
+PROBLEM: "Port 8000 already in use"
+SOLUTION:
+- Close other applications using port 8000
+- Or edit config.py and change PORT = 8001
+
+PROBLEM: Gemini API not working
+SOLUTION:
+- Check API key is set: echo %GEMINI_API_KEY%
+- Verify key at: https://aistudio.google.com/app/apikey
+- Make sure to use run_with_ai.bat
+
+PROBLEM: Slow installation
+SOLUTION:
+- Normal! EasyOCR downloads ~400MB of models
+- Wait 5-10 minutes for first installation
+- Subsequent runs will be fast
+
+
+========================================
+WHAT GETS INSTALLED
+========================================
+
+Core Packages:
+- FastAPI - Web framework
+- EasyOCR - OCR engine (~400MB with models)
+- OpenCV - Image processing
+- Pillow - Image handling
+- TextBlob - Text processing
+- Google Generative AI - Gemini for evaluation
+
+Total Size: ~550MB (excluding Python itself)
+
+
+========================================
+QUICK REFERENCE
+========================================
+
+Install:     setup.bat
+Run with AI: run_with_ai.bat
+Run basic:   run.bat
+Stop:        Ctrl+C
+Browser:     http://localhost:8000
+API Key:     https://aistudio.google.com/app/apikey
+
+
+========================================
+LINUX/MACOS INSTALLATION
+========================================
+
+1. Make scripts executable:
+   chmod +x setup.sh run.sh
+
+2. Run setup:
+   ./setup.sh
+
+3. Set API key:
+   export GEMINI_API_KEY=your_api_key_here
+
+4. Run application:
+   ./run.sh
+
+5. Open: http://localhost:8000
+
+
+========================================
+OFFLINE INSTALLATION (No Internet)
+========================================
+
+If the new laptop has no internet:
+
+1. On a laptop WITH internet:
+   pip download -r requirements.txt -d packages/
+
+2. Copy entire project + packages folder to new laptop
+
+3. On new laptop:
+   pip install --no-index --find-links=packages/ -r requirements.txt
+
+
+========================================
+NEED HELP?
+========================================
+
+See documentation:
+- INSTALL.md - Detailed installation guide
+- README.md - Full documentation  
+- TROUBLESHOOTING_INSTALL.md - Common issues
+- GEMINI_EVALUATION_GUIDE.md - AI features
+
+Project Structure:
+vit hack/
+├── app.py              - Main application
+├── config.py           - Settings
+├── requirements.txt    - Dependencies
+├── setup.bat          - Auto installer
+├── run_with_ai.bat    - Run with AI
+└── utils/             - Core modules
+
+
+========================================
+SUMMARY FOR NEW LAPTOP
+========================================
+
+✓ Install Python 3.8+
+✓ Copy project folder
+✓ Run: setup.bat
+✓ Get API key from: https://aistudio.google.com/app/apikey
+✓ Run: set GEMINI_API_KEY=your_key
+✓ Run: run_with_ai.bat
+✓ Open: http://localhost:8000
+✓ Enjoy! 🎉
+
+
+Questions? Check INSTALL.md for details!

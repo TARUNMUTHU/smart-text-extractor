@@ -1,0 +1,26 @@
+# Core dependencies
+fastapi>=0.104.1
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
+
+# Image processing (NO PDF dependencies - Poppler not needed!)
+Pillow>=10.4.0
+opencv-python>=4.10.0
+
+# OCR engine - EasyOCR only (fast and effective)
+easyocr>=1.7.0
+
+# Text processing
+textblob>=0.17.1
+python-docx>=1.1.0
+
+# Google Vision API (optional - for best quality)
+google-cloud-vision>=3.4.0
+
+# Google Gemini API (for answer evaluation)
+google-generativeai>=0.3.0
+
+# Utilities
+numpy>=1.24.0
+aiofiles>=23.2.0
+Jinja2>=3.1.0

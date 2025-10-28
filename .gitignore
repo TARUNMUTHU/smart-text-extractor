@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Project specific
+static/uploads/*
+!static/uploads/.gitkeep
+static/outputs/*
+!static/outputs/.gitkeep
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Google credentials
+credentials.json
+*.json
+
+# Models and cache
+.cache/
+models/
+*.pth
+*.pt

@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app_name }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .upload-section {
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9ff;
+        }
+
+        .upload-area:hover {
+            background: #f0f2ff;
+            border-color: #764ba2;
+        }
+
+        .upload-area.dragover {
+            background: #e8ebff;
+            border-color: #764ba2;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .file-info {
+            background: #f0f2ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .file-info.show {
+            display: block;
+        }
+
+        .engine-selector {
+            margin: 30px 0;
+        }
+
+        .engine-selector label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .engine-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .engine-option {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .engine-option input[type="radio"] {
+            display: none;
+        }
+
+        .engine-option label {
+            display: block;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .engine-option input[type="radio"]:checked + label {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .engine-option label:hover {
+            border-color: #667eea;
+        }
+
+        .process-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .process-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .process-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .progress-section.show {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #f0f2ff;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .progress-message {
+            text-align: center;
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .result-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .result-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .result-text {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .download-btn {
+            flex: 1;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .download-btn.secondary {
+            background: #4CAF50;
+        }
+
+        .download-btn.secondary:hover {
+            background: #45a049;
+        }
+
+        .reset-btn {
+            background: #ff6b6b;
+        }
+
+        .reset-btn:hover {
+            background: #ee5a52;
+        }
+
+        .error-message {
+            background: #fff0f0;
+            color: #d32f2f;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #d32f2f;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        /* Evaluation Section Styles */
+        .evaluation-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .evaluation-form {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group input[type="file"] {
+            padding: 10px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            width: 100%;
+        }
+
+        .evaluate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.3s;
+            width: 100%;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .evaluate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .evaluate-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .evaluation-results {
+            margin-top: 25px;
+            background: #fff;
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .score-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .score-circle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .score-value {
+            font-size: 3em;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .score-total {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .grade-display {
+            text-align: center;
+        }
+
+        .grade-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .grade-value {
+            font-size: 3em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .percentage-display {
+            text-align: center;
+        }
+
+        .percentage-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #4CAF50;
+        }
+
+        .evaluation-text {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            max-height: 600px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.8;
+            font-size: 0.95em;
+        }
+
+        .evaluation-text h2,
+        .evaluation-text h3 {
+            color: #667eea;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .evaluation-text ul,
+        .evaluation-text ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 {{ app_name }}</h1>
+            <p>Transform handwritten images into clean, readable text with AI</p>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="upload-section" id="uploadSection">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">�️</div>
+                <div class="upload-text">Drop your image here or click to browse</div>
+                <div class="upload-hint">Supports: JPG, PNG, BMP, TIFF, WebP (Max 50 MB)</div>
+            </div>
+            <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.bmp,.tiff,.tif,.webp,image/*">
+            
+            <div class="file-info" id="fileInfo">
+                <strong>Selected file:</strong> <span id="fileName"></span>
+            </div>
+
+            <!-- OCR Engine Selector -->
+            <div class="engine-selector">
+                <label>Choose OCR Engine:</label>
+                <div class="engine-options">
+                    <div class="engine-option">
+                        <input type="radio" id="easyocr" name="engine" value="easyocr" checked>
+                        <label for="easyocr">
+                            <strong>EasyOCR</strong><br>
+                            <small>Fast & Accurate</small>
+                        </label>
+                    </div>
+                    <div class="engine-option">
+                        <input type="radio" id="google_vision" name="engine" value="google_vision">
+                        <label for="google_vision">
+                            <strong>Google Vision</strong><br>
+                            <small>Best Quality (API Key Required)</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <button class="process-btn" id="processBtn" disabled>Upload & Extract Text</button>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="progress-section" id="progressSection">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill">0%</div>
+            </div>
+            <div class="progress-message" id="progressMessage">Processing...</div>
+            <div class="spinner"></div>
+        </div>
+
+        <!-- Result Section -->
+        <div class="result-section" id="resultSection">
+            <h2>✅ Processing Complete!</h2>
+            
+            <div class="result-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="confidence">-</div>
+                    <div class="stat-label">Confidence</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="processingTime">-</div>
+                    <div class="stat-label">Time</div>
+                </div>
+            </div>
+
+            <h3>Extracted Text:</h3>
+            <div class="result-text" id="resultText"></div>
+
+            <!-- Evaluation Section -->
+            <div class="evaluation-section">
+                <h3>📊 Evaluate Answers (Powered by Gemini AI)</h3>
+                
+                <div class="evaluation-form">
+                    <div class="form-group">
+                        <label for="subject">Subject:</label>
+                        <input type="text" id="subject" placeholder="e.g., Mathematics, Science, English" value="General">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="totalMarks">Total Marks:</label>
+                        <input type="number" id="totalMarks" value="100" min="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="answerKey">Answer Key / Marking Scheme (Optional):</label>
+                        <textarea id="answerKey" placeholder="Enter correct answers or marking scheme here. Leave empty for general assessment." rows="4"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Or upload reference answer sheet image:</label>
+                        <input type="file" id="referenceInput" accept="image/*">
+                    </div>
+                    
+                    <button class="evaluate-btn" id="evaluateBtn">🤖 Evaluate with AI</button>
+                </div>
+
+                <!-- Evaluation Results -->
+                <div class="evaluation-results" id="evaluationResults" style="display: none;">
+                    <h3>📋 Evaluation Report</h3>
+                    
+                    <div class="score-display">
+                        <div class="score-circle">
+                            <div class="score-value" id="scoreValue">0</div>
+                            <div class="score-total" id="scoreTotal">/ 100</div>
+                        </div>
+                        <div class="grade-display">
+                            <div class="grade-label">Grade:</div>
+                            <div class="grade-value" id="gradeValue">-</div>
+                        </div>
+                        <div class="percentage-display">
+                            <div class="percentage-value" id="percentageValue">0%</div>
+                        </div>
+                    </div>
+
+                    <div class="evaluation-text" id="evaluationText"></div>
+                </div>
+            </div>
+
+            <div class="download-buttons">
+                <button class="download-btn" id="downloadTxt">📥 Download TXT</button>
+                <button class="download-btn secondary" id="downloadDocx">📥 Download DOCX</button>
+                <button class="download-btn reset-btn" id="resetBtn">🔄 Process Another</button>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage"></div>
+    </div>
+
+    <script>
+        let currentJobId = null;
+        let selectedFile = null;
+
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const processBtn = document.getElementById('processBtn');
+        const uploadSection = document.getElementById('uploadSection');
+        const progressSection = document.getElementById('progressSection');
+        const resultSection = document.getElementById('resultSection');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // File upload handling
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            // Check if file is an image
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/bmp', 'image/tiff', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                showError('Please select an image file (JPG, PNG, BMP, TIFF, or WebP)');
+                return;
+            }
+
+            if (file.size > 50 * 1024 * 1024) {
+                showError('File size exceeds 50 MB limit');
+                return;
+            }
+
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileInfo.classList.add('show');
+            processBtn.disabled = false;
+        }
+
+        // Process button
+        processBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            const selectedEngine = document.querySelector('input[name="engine"]:checked').value;
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('ocr_engine', selectedEngine);
+
+            try {
+                processBtn.disabled = true;
+                uploadSection.style.display = 'none';
+                progressSection.classList.add('show');
+
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Upload failed');
+                }
+
+                const data = await response.json();
+                currentJobId = data.job_id;
+
+                // Start polling for status
+                pollStatus();
+
+            } catch (error) {
+                showError('Upload failed: ' + error.message);
+                resetUI();
+            }
+        });
+
+        // Poll for processing status
+        async function pollStatus() {
+            try {
+                const response = await fetch(`/status/${currentJobId}`);
+                const data = await response.json();
+
+                // Update progress
+                document.getElementById('progressFill').style.width = data.progress + '%';
+                document.getElementById('progressFill').textContent = data.progress + '%';
+                document.getElementById('progressMessage').textContent = data.message;
+
+                if (data.status === 'completed') {
+                    showResults(data.result);
+                } else if (data.status === 'failed') {
+                    showError('Processing failed: ' + data.message);
+                    resetUI();
+                } else {
+                    // Continue polling
+                    setTimeout(pollStatus, 1000);
+                }
+
+            } catch (error) {
+                showError('Failed to get status: ' + error.message);
+                resetUI();
+            }
+        }
+
+        // Show results
+        function showResults(result) {
+            progressSection.classList.remove('show');
+            resultSection.classList.add('show');
+
+            document.getElementById('confidence').textContent = (result.confidence * 100).toFixed(1) + '%';
+            document.getElementById('processingTime').textContent = result.processing_time.toFixed(1) + 's';
+            document.getElementById('resultText').textContent = result.text;
+        }
+
+        // Download buttons
+        document.getElementById('downloadTxt').addEventListener('click', () => {
+            window.location.href = `/download/${currentJobId}/txt`;
+        });
+
+        document.getElementById('downloadDocx').addEventListener('click', () => {
+            window.location.href = `/download/${currentJobId}/docx`;
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            resetUI();
+            if (currentJobId) {
+                fetch(`/cleanup/${currentJobId}`, { method: 'DELETE' });
+            }
+        });
+
+        // Evaluation functionality
+        const evaluateBtn = document.getElementById('evaluateBtn');
+        const evaluationResults = document.getElementById('evaluationResults');
+        const referenceInput = document.getElementById('referenceInput');
+        
+        evaluateBtn.addEventListener('click', async () => {
+            if (!currentJobId) {
+                showError('No job ID available');
+                return;
+            }
+            
+            evaluateBtn.disabled = true;
+            evaluateBtn.textContent = '⏳ Evaluating...';
+            
+            try {
+                const subject = document.getElementById('subject').value;
+                const totalMarks = document.getElementById('totalMarks').value;
+                const answerKey = document.getElementById('answerKey').value;
+                const referenceFile = referenceInput.files[0];
+                
+                let evaluation;
+                
+                if (referenceFile) {
+                    // Evaluate with reference image
+                    const formData = new FormData();
+                    formData.append('reference_file', referenceFile);
+                    formData.append('subject', subject);
+                    formData.append('total_marks', totalMarks);
+                    
+                    const response = await fetch(`/evaluate-with-reference/${currentJobId}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.detail || 'Evaluation failed');
+                    }
+                    
+                    evaluation = await response.json();
+                } else {
+                    // Evaluate with text answer key
+                    const formData = new FormData();
+                    formData.append('answer_key', answerKey);
+                    formData.append('subject', subject);
+                    formData.append('total_marks', totalMarks);
+                    
+                    const response = await fetch(`/evaluate/${currentJobId}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.detail || 'Evaluation failed');
+                    }
+                    
+                    evaluation = await response.json();
+                }
+                
+                // Display evaluation results
+                displayEvaluation(evaluation);
+                
+            } catch (error) {
+                showError('Evaluation failed: ' + error.message);
+            } finally {
+                evaluateBtn.disabled = false;
+                evaluateBtn.textContent = '🤖 Evaluate with AI';
+            }
+        });
+        
+        function displayEvaluation(evaluation) {
+            // Show results container
+            evaluationResults.style.display = 'block';
+            
+            // Update score
+            document.getElementById('scoreValue').textContent = evaluation.score;
+            document.getElementById('scoreTotal').textContent = `/ ${evaluation.total_marks}`;
+            document.getElementById('gradeValue').textContent = evaluation.grade;
+            document.getElementById('percentageValue').textContent = evaluation.percentage + '%';
+            
+            // Update evaluation text
+            document.getElementById('evaluationText').innerHTML = formatEvaluationText(evaluation.evaluation_text);
+            
+            // Scroll to results
+            evaluationResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        function formatEvaluationText(text) {
+            // Convert markdown-style headers and formatting
+            text = text.replace(/## (.*)/g, '<h2>$1</h2>');
+            text = text.replace(/### (.*)/g, '<h3>$1</h3>');
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            
+            // Convert bullet points
+            text = text.replace(/^- (.*)/gm, '<li>$1</li>');
+            text = text.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+            
+            return text;
+        }
+
+        // Utility functions
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            setTimeout(() => errorMessage.classList.remove('show'), 5000);
+        }
+
+        function resetUI() {
+            uploadSection.style.display = 'block';
+            progressSection.classList.remove('show');
+            resultSection.classList.remove('show');
+            fileInfo.classList.remove('show');
+            processBtn.disabled = true;
+            selectedFile = null;
+            currentJobId = null;
+            fileInput.value = '';
+        }
+    </script>
+</body>
+</html>
